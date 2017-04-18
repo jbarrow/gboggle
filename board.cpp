@@ -2,10 +2,11 @@
 #include "trie.h"
 
 #include <iostream>
-#include <cstdlib>
 #include <string>
 #include <vector>
 #include <stack>
+#include <random>
+#include <cstdlib>
 
 Board::Board(int n) : n(n) {
   // Create an nxn boggle board, and randomly initialize it.
@@ -35,6 +36,10 @@ void Board::print() {
   }
 }
 
+int seeded_random(int i) {
+  return std::rand()%i;
+}
+
 void Board::permutation_init(char *alphabet, int alphabet_size) {
   if(alphabet_size != n * n) {
     std::cout << "Board permutation and alphabet size aren't compatible." << std::endl;
@@ -43,7 +48,7 @@ void Board::permutation_init(char *alphabet, int alphabet_size) {
 
   std::vector<char> alphabet_vector;
   for(int i = 0; i < alphabet_size; ++i) alphabet_vector.push_back(alphabet[i]);
-  std::random_shuffle( alphabet_vector.begin(), alphabet_vector.end() );
+  std::random_shuffle(alphabet_vector.begin(), alphabet_vector.end(), seeded_random);
 
   for(int j = 0; j < n; ++j)
     for(int i = 0; i < n; ++i)
