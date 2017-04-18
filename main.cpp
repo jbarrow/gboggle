@@ -1,0 +1,33 @@
+#include "trie.h"
+#include "board.h"
+#include "genetic.h"
+
+#include <fstream>
+#include <iostream>
+#include <string>
+
+void read_dictionary(std::string filename, Trie *root) {
+  // open the dictionary file (one word per line)
+  std::ifstream infile(filename);
+  std::string line;
+
+  while(std::getline(infile, line)) {
+    // insert the word into the trie
+    root->insert(line);
+  }
+}
+
+int main(int argc, char **argv) {
+  char alphabet[] = "abcdefghiklmnopqrstuvwxyz";
+  // create a new trie, and load our dictionary into it
+  Trie *trie = new Trie();
+  read_dictionary("data/words.txt", trie);
+
+  Board *b = new Board(5);
+  b->permutation_init(alphabet, ALPHABET_SIZE);
+  b->print();
+  std::cout << "Final Score: " << b->score(trie) << std::endl;
+
+  // clean up the trie
+  delete trie;
+}
