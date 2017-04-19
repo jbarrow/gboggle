@@ -6,10 +6,11 @@
 #include "trie.h"
 
 class Board {
-  char **board_state;
-  int n;
 
 public:
+  int n;
+  char **board_state;
+
   Board(int n);
   Board(int n, char** board);
   ~Board();

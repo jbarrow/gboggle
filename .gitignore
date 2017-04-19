@@ -1,2 +1,5 @@
 boggle
 gboggle
+.DS_Store
+data/test.txt
+gboggle.dSYM/

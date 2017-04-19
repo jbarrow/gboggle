@@ -1,5 +1,5 @@
 all:
-	clang++ trie.cpp main.cpp board.cpp genetic.cpp -o gboggle
+	clang++ -g trie.cpp main.cpp board.cpp genetic/genetic.cpp genetic/aliastable.cpp -o gboggle
 
 clean:
 	rm gboggle

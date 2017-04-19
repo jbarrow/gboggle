@@ -16,6 +16,9 @@ void Trie::insert(std::string word) {
   // Insert a new word into the trie.
   Trie *node = this;
   for(int i = 0; i < word.length(); ++i) {
+    // skipping non-valid characters
+    if(char_to_index(word[i]) >= ALPHABET_SIZE || char_to_index(word[i]) < 0)
+      return;
     // if the child doesn't yet exist, create it
     if(node->children[char_to_index(word[i])] == NULL) {
       node->children[char_to_index(word[i])] = new Trie();
