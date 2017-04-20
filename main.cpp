@@ -41,12 +41,12 @@ int main(int argc, char **argv) {
       std::srand(atoi(argv[3]));
     // get the iterations
     int iterations = atoi(argv[1]);
-    char alphabet[] = "abcdefghiklmnopqrstuvwxyz";
     // create a new trie, and load our dictionary into it
     Trie *trie = new Trie();
     read_dictionary(argv[4], trie);
 
     //Board *b = new Board(5);
+    //char alphabet[] = "abcdefghiklmnopqrstuvwxyz";
     //b->permutation_init(alphabet, ALPHABET_SIZE);
     //b->print();
     //std::cout << "Final Score: " << b->score(trie) << std::endl;
@@ -68,14 +68,13 @@ int main(int argc, char **argv) {
       std::srand(atoi(argv[2]));
     // get the iterations
     int maxIteration = atoi(argv[1]);
-    char alphabet[] = "abcdefghiklmnopqrstuvwxyz";
     // create a new trie, and load our dictionary into it
     Trie *trie = new Trie();
     read_dictionary(argv[3], trie);
 
     BruteForce *brute = new BruteForce(maxIteration, trie);
     brute->search();
-    
+
     // clean up the trie
     delete trie;
   }

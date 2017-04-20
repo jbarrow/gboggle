@@ -25,7 +25,7 @@ int AliasTable::sample() {
 
 void AliasTable::recompute(std::vector<double> dist) {
   int i, ux, ox;
-  double sum;
+  double sum = 0.0;
   std::vector<int> overfull, underfull;
 
   // normalize the distribution
