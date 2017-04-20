@@ -14,18 +14,24 @@ To compile the source, there's a standard Makefile, so you can just run:
   make
 ```
 
+Note that this compiles __all__ versions of the reverse boggle solver (genetic, brute force, and greedy). You can make just the genetic version with:
+
+```
+  make genetic
+```
+
 ## Usage
 
 A sample usage that would run 1 iteration of the genetic algorithm with 100 members of the population, using the data in the `data/` directory, and no random seed:
 
 ```
-  ./gboggle 1 100 -1 data/usa2.txt
+  ./gnboggle 1 100 -1 data/usa2.txt
 ```
 
 More generally, the usage is:
 
 ```
-  ./gboggle [iterations] [population size] [random seed, or -1 for none] [dictionary file]
+  ./gnboggle [iterations] [population size] [random seed, or -1 for none] [dictionary file]
 ```
 
 Where the dictionary file is one word per line.
@@ -36,10 +42,16 @@ Compute the best scoring Boggle board given a dictionary by brute force. Iterate
 
 ## Compilation
 
-To compile the source, there's a standard Makefile, so you can just run:
+You can compile the brute force version the same way you compile the genetic version (both are in the `all` target):
 
 ```
   make
+```
+
+If you just want to make the brute force version, you can compile with:
+
+```
+  make bruteforce
 ```
 
 ## Usage
@@ -47,14 +59,29 @@ To compile the source, there's a standard Makefile, so you can just run:
 A sample usage that would evaluate 1000 permutations of the boards, using the data in the `data/` directory, and no random seed:
 
 ```
-  ./gboggle 1000 -1 data/usa2.txt
+  ./bfboggle 1000 -1 data/usa2.txt
 ```
 
 More generally, the usage is:
 
 ```
-  ./gboggle [maxIteration] [random seed, or -1 for none] [dictionary file]
+  ./bfboggle [maxIteration] [random seed, or -1 for none] [dictionary file]
 ```
 
 Where the dictionary file is one word per line.
 
+# Reverse Boggle Solving with a Greedy Algorithm
+
+## Compilation
+
+Same as above. If you just want to make the greedy version, you can compile with:
+
+```
+  make greedy
+```
+
+## Usage
+
+```
+  ./grboggle data/usa2.txt
+```

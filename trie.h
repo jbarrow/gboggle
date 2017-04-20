@@ -2,6 +2,8 @@
 #define __TRIE_H__
 
 #include <string>
+#include <iostream>
+#include <fstream>
 
 #define ALPHABET_SIZE 25
 
@@ -20,5 +22,7 @@ public:
 
   bool valid;
 };
+
+void read_dictionary(std::string filename, Trie *root);
 
 #endif

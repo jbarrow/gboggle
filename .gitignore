@@ -1,6 +1,6 @@
-boggle
-gboggle
+gnboggle
+bfboggle
 .DS_Store
 data/test.txt
-gboggle.dSYM/
+*.dSYM/
 *.o

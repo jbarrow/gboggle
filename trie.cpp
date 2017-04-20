@@ -48,3 +48,19 @@ bool Trie::search(std::string word) {
   if(node == NULL) return false;
   return node->valid;
 }
+
+void read_dictionary(std::string filename, Trie *root) {
+  std::cout << "Reading: " << filename << std::endl;
+  // open the dictionary file (one word per line)
+  std::ifstream infile(filename);
+  std::string line;
+  int count = 0;
+
+  while(std::getline(infile, line)) {
+    // insert the word into the trie
+    root->insert(line);
+    ++count;
+  }
+
+  std::cout << "Read " << count << " words" << std::endl;
+}
