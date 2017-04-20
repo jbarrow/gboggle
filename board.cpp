@@ -55,6 +55,17 @@ void Board::permutation_init(char *alphabet, int alphabet_size) {
       board_state[i][j] = alphabet_vector[i*n+j];
 }
 
+void Board::sequence_init(char *alphabet, int alphabet_size) {
+  if(alphabet_size != n * n) {
+    std::cout << "Board permutation and alphabet size aren't compatible." << std::endl;
+    std::exit(0);
+  }
+
+  for(int j = 0; j < n; ++j)
+    for(int i = 0; i < n; ++i)
+      board_state[i][j] = alphabet[i*n+j];
+}
+
 void Board::random_init(char *alphabet, int alphabet_size) {}
 
 int Board::score(Trie *dict) {

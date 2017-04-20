@@ -20,6 +20,7 @@ public:
   std::vector<std::string> solve(Trie *dict);
   void search(Trie*, std::string, int, int, std::vector<bool>, std::vector<std::string> &found);
 
+  void sequence_init(char *alphabet, int alphabet_size);
   void permutation_init(char *alphabet, int alphabet_size);
   void random_init(char *alphabet, int alphabet_size);
   void print();

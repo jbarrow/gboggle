@@ -29,3 +29,32 @@ More generally, the usage is:
 ```
 
 Where the dictionary file is one word per line.
+
+# Reverse Boggle Solving with Brute Force
+
+Compute the best scoring Boggle board given a dictionary by brute force. Iterate through all possible permutations of boards and report the best one.
+
+## Compilation
+
+To compile the source, there's a standard Makefile, so you can just run:
+
+```
+  make
+```
+
+## Usage
+
+A sample usage that would evaluate 1000 permutations of the boards, using the data in the `data/` directory, and no random seed:
+
+```
+  ./gboggle 1000 -1 data/usa2.txt
+```
+
+More generally, the usage is:
+
+```
+  ./gboggle [maxIteration] [random seed, or -1 for none] [dictionary file]
+```
+
+Where the dictionary file is one word per line.
+
