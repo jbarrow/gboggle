@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <stack>
 #include <random>
 #include <cstdlib>
@@ -72,17 +73,22 @@ int Board::score(Trie *dict) {
   // Given the current board state, return the total score for all words in a
   // dictionary.
   std::vector<std::string> words = solve(dict);
-  int score = 0;
+  int score = 0, count = 0;
   // add the score for every word in the list
   for(std::vector<std::string>::size_type i = 0; i != words.size(); ++i) {
     score += word_score(words[i]);
+    ++count;
+
+    if(count >= 20) break;
   }
+
   return score;
 }
 
 int Board::word_score(std::string word) {
   // Get the score for a given word. Note that the score is only dependent on
   // the length of the word.
+  /*
   switch(word.length()) {
     case 1:
     case 2:
@@ -99,6 +105,8 @@ int Board::word_score(std::string word) {
     default:
       return 11;
   }
+  */
+  return word.length();
 }
 
 void Board::search(Trie *dict, std::string prefix, int x, int y, std::vector<bool> searched, std::vector<std::string> &found) {
@@ -128,6 +136,7 @@ std::vector<std::string> Board::solve(Trie *dict) {
   std::vector<std::string> words;
   std::vector<bool> searched;
   int i, j;
+  compare c;
 
   for(i = 0; i < n * n; ++i) searched.push_back(false);
 
@@ -135,6 +144,8 @@ std::vector<std::string> Board::solve(Trie *dict) {
   for(i = 0; i < n; ++i)
     for(j = 0; j < n; ++j)
       search(dict, "", i, j, searched, words);
+
+  std::sort(words.begin(), words.end(), c);
 
   return words;
 }

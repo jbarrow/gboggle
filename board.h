@@ -26,4 +26,10 @@ public:
   void print();
 };
 
+struct compare {
+  bool operator()(const std::string& fst, const std::string& snd) {
+    return fst.size() > snd.size();
+  }
+};
+
 #endif

@@ -15,6 +15,10 @@ class Genetic {
   std::vector<Board*> buffer;
   Trie *dict;
 
+  int tournament_selection(AliasTable* table, std::vector<double> scores);
+  void pmx_2d_crossover(Board *p1, Board*p2, Board *update);
+  void mutate(Board *original, Board *update);
+
 public:
   Genetic(int population_size, Trie *dict);
   ~Genetic();
