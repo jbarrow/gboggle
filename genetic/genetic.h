@@ -8,6 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <random>
+#include <algorithm>
 
 class Genetic {
   int population_size;

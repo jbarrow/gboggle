@@ -38,4 +38,8 @@ void BruteForce::search() {
   std::cout << "Best sequence:" << std::endl;
   bestBoard->print();
 
+  std::vector<std::string> words = bestBoard->solve(dict);
+  std::cout << "Words found:" << std::endl;
+  for (std::string w : words) std::cout << "\t" << w << std::endl;
+
 }

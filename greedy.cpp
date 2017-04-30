@@ -6,16 +6,15 @@
 int main(int argc, char **argv) {
   if(argc != 2) {
     std::cout << "Usage:" << std::endl;
-    std::cout << "\t./bruteforce [dictionary]" << std::endl;
+    std::cout << "\t./greedy [dictionary]" << std::endl;
     exit(0);
   }
 
-  // create a new trie, and load our dictionary into it
-  Trie *trie = new Trie();
-  read_dictionary(argv[1], trie);
+  // load our dictionary into a vector of strings
+  std::vector<std::string> wordlist;
+  read_dictionary(argv[1], &wordlist);
 
-  // TODO: Sri, you can put your code here.
-
-  // clean up the trie
-  delete trie;
+  Greedy *g = new Greedy(wordlist);
+  g->search();
+  delete g;
 }

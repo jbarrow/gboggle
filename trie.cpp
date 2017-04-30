@@ -64,3 +64,16 @@ void read_dictionary(std::string filename, Trie *root) {
 
   std::cout << "Read " << count << " words" << std::endl;
 }
+
+void read_dictionary(std::string filename, std::vector<std::string> *vec) {
+  std::cout << "Reading: " << filename << std::endl;
+
+  std::ifstream infile(filename);
+  std::string line;
+  vec->clear();
+  
+  while(std::getline(infile, line)) vec->push_back(line);
+
+  std::cout << "Read " << (int)vec->size() << " words" << std::endl;
+}
+

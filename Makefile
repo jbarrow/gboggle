@@ -1,10 +1,10 @@
 CC=g++
-CFLAGS=-g -Wall
+CFLAGS=-g -Wall -std=c++11
 
-all: trie.o board.o bruteforce.o genetic.o aliastable.o greedy.o
+all: trie.o board.o bruteforce.o genetic.o aliastable.o adjacencymatrix.o greedy.o
 	$(CC) $(CFLAGS) -o gnboggle trie.o board.o genetic.o aliastable.o genetic.cpp
 	$(CC) $(CFLAGS) -o bfboggle trie.o board.o bruteforce.o bruteforce.cpp
-	$(CC) $(CFLAGS) -o grboggle trie.o board.o greedy.o greedy.cpp
+	$(CC) $(CFLAGS) -o grboggle trie.o board.o greedy.o adjacencymatrix.o greedy.cpp
 
 genetic: genetic.o trie.o board.o aliastable.o
 	$(CC) $(CFLAGS) -o gnboggle trie.o board.o genetic.o aliastable.o genetic.cpp
@@ -12,8 +12,8 @@ genetic: genetic.o trie.o board.o aliastable.o
 bruteforce: trie.o board.o bruteforce.o
 	$(CC) $(CFLAGS) -o bfboggle trie.o board.o bruteforce.o bruteforce.cpp
 
-greedy: trie.o board.o greedy.o
-	$(CC) $(CFLAGS) -o grboggle trie.o board.o greedy.o greedy.cpp
+greedy: trie.o board.o greedy.o adjacencymatrix.o
+	$(CC) $(CFLAGS) -o grboggle trie.o board.o greedy.o adjacencymatrix.o greedy.cpp
 
 greedy.o: board.o trie.o
 	$(CC) $(CFLAGS) -c greedy/greedy.cpp trie.o board.o
@@ -32,6 +32,9 @@ trie.o:
 
 aliastable.o:
 	$(CC) $(CFLAGS) -c genetic/aliastable.cpp
+
+adjacencymatrix.o:
+	$(CC) $(CFLAGS) -c greedy/adjacencymatrix.cpp
 
 clean:
 	rm *.o

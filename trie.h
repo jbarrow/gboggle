@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #define ALPHABET_SIZE 25
 
@@ -24,5 +25,6 @@ public:
 };
 
 void read_dictionary(std::string filename, Trie *root);
+void read_dictionary(std::string filename, std::vector<std::string> *vec);
 
 #endif
