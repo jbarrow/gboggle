@@ -149,3 +149,20 @@ std::vector<std::string> Board::solve(Trie *dict) {
 
   return words;
 }
+
+Point Board::find_index(char value) {
+  int i, j;
+  Point point;
+
+  for(i = 0; i < n; ++i) {
+    for(j = 0; j < n; ++j) {
+      if(board_state[i][j] == value) {
+        point.x = i;
+        point.y = j;
+        break;
+      }
+    }
+  }
+
+  return point;
+}

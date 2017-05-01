@@ -5,6 +5,10 @@
 #include <vector>
 #include "trie.h"
 
+struct Point {
+  int x, y;
+};
+
 class Board {
 
 public:
@@ -24,6 +28,8 @@ public:
   void permutation_init(char *alphabet, int alphabet_size);
   void random_init(char *alphabet, int alphabet_size);
   void print();
+
+  Point find_index(char value);
 };
 
 struct compare {
