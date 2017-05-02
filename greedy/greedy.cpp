@@ -10,7 +10,7 @@ Greedy::Greedy(std::vector<std::string> wordlist) {
 }
 
 Greedy::~Greedy() {
-
+    delete adj;
 }
 
 void Greedy::search() {
@@ -24,31 +24,37 @@ void Greedy::search() {
     // generate board by repeatedly adding words to adjacency matrix, in order
     // from longest to shortest
     AdjacencyMatrix* candidate;
+    Board* out_board = NULL;
     std::vector<std::string> added_words;
     for (int i = 0; i < (int)wordlist.size(); i++) {
         candidate = new AdjacencyMatrix(adj, wordlist[i]);
 
-        if (candidate->is_valid()) {
+        Board* candidate_board = candidate->to_board();
+        if (candidate_board != NULL) {
             delete adj;
             adj = candidate;
 
+            if (out_board != NULL) delete out_board;
+            out_board = candidate_board;
+
             added_words.push_back(wordlist[i]);
+            std::cout << "\r" << i << ": Added " << wordlist[i] << "                         " << std::endl;
+        } else {
+            delete candidate_board;
+            std::cout << "\r" << i << ": Couldn't add " << wordlist[i] << "                  " << std::flush;
         }
+
+        if (added_words.size() >= 20) break;
     }
+    std::cout << std::endl;
 
     // convert adjacency matrix to board, and print it out
-    Board* out_board = candidate->to_board();
     if (out_board != NULL) {
         out_board->print();
+        delete out_board;
+    } else {
+        std::cout << "!!! FAILURE !!!" << std::endl;
     }
-    delete out_board;
-
-    // TODO: handle edge case where less than 25 words could be added
-    /*
-    std::cout << "Longest 25 words on board:" << std::endl;
-    for (int i = 0; i < 25; i++)
-        std::cout << "\t" << added_words[i] << std::endl;
-    */
 }
 
 

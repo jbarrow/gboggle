@@ -11,19 +11,26 @@
 
 Board::Board(int n) : n(n) {
   // Create an nxn boggle board, and randomly initialize it.
-  int i;
+
   // allocate all the pointers we'll need
-  board_state = new char*[n*sizeof(char*)];
-  board_state[0] = new char[n*n*sizeof(char)];
+  board_state = new char*[n];
+  board_state[0] = new char[n * n];
+
   // set all the pointers at the beginning of the rows to the correct value
-  for(i = 1; i < n; ++i)
+  for (int i = 1; i < n; ++i)
     board_state[i] = board_state[0] + i * n;
+
+  // initialize board to all 'X' to indicate blank spaces
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++)
+      board_state[i][j] = 'X';
 }
 
 // Create an nxn boggle board with predefined values.
 Board::Board(int n, char **board) : n(n), board_state(board) {}
 
 Board::~Board() {
+  delete[] this->board_state[0];
   delete[] this->board_state;
 }
 
@@ -171,4 +178,85 @@ Point Board::find_index(char value) {
   }
 
   return point;
+}
+
+
+
+
+// a few helpful utility functions
+bool Board::has_char(char c) {
+  for (int x = 0; x < n; x++)
+    for (int y = 0; y < n; y++)
+      if (board_state[x][y] == c) return true;
+
+  return false;
+}
+
+char Board::get_with_wrap(int x, int y) {
+  while (x < 0) x += 5;
+  while (x > 4) x -= 5;
+  while (y < 0) y += 5;
+  while (y > 4) y -= 5;
+
+  return board_state[x][y];
+}
+
+std::pair<int, int> Board::pos_with_wrap(int x, int y) {
+  while (x < 0) x += 5;
+  while (x > 4) x -= 5;
+  while (y < 0) y += 5;
+  while (y > 4) y -= 5;
+
+  return std::make_pair(x, y);
+}
+
+std::set<char> Board::chars() {
+  std::set<char> ret;
+  for (int x = 0; x < n; x++)
+    for (int y = 0; y < n; y++)
+      if (board_state[x][y] != 'X')
+        ret.insert(board_state[x][y]);
+
+  return ret;
+}
+
+std::set<char> Board::chars_neighboring(int x, int y) {
+  std::set<char> ret;
+
+  for (int x_off = -1; x_off <= 1; x_off++) {
+    for (int y_off = -1; y_off <= 1; y_off++) {
+      if (x_off == 0 && y_off == 0) continue;
+
+      char c = get_with_wrap(x + x_off, y + y_off);
+      if (c != 'X') ret.insert(c);
+    }
+  }
+
+  return ret;
+}
+
+std::set<std::pair<int, int>> Board::blank_spaces() {
+  std::set<std::pair<int, int>> ret;
+  for (int x = 0; x < n; x++)
+    for (int y = 0; y < n; y++)
+      if (board_state[x][y] == 'X')
+        ret.insert(std::make_pair(x, y));
+
+  return ret;
+}
+
+std::set<std::pair<int, int>> Board::blank_spaces_neighboring(int x, int y) {
+  std::set<std::pair<int, int>> ret;
+
+  for (int x_off = -1; x_off <= 1; x_off++) {
+    for (int y_off = -1; y_off <= 1; y_off++) {
+      if (x_off == 0 && y_off == 0) continue;
+
+      auto c = pos_with_wrap(x + x_off, y + y_off);
+      if (board_state[c.first][c.second] == 'X')
+        ret.insert(c);
+    }
+  }
+
+  return ret;
 }

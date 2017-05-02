@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <set>
+#include <utility>
 #include "trie.h"
 
 struct Point {
@@ -31,6 +33,16 @@ public:
   void print();
 
   Point find_index(char value);
+
+  bool has_char(char c);
+
+  char get_with_wrap(int x, int y);
+  std::pair<int, int> pos_with_wrap(int x, int y);
+
+  std::set<char> chars();
+  std::set<char> chars_neighboring(int x, int y);
+  std::set<std::pair<int, int>> blank_spaces();
+  std::set<std::pair<int, int>> blank_spaces_neighboring(int x, int y);
 };
 
 struct compare {

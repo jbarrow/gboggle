@@ -18,7 +18,7 @@ class AdjacencyMatrix {
         bool is_valid();
         Board* to_board();
         bool fill_board(Board* board, std::map<char, std::set<char>>& constraints,
-                        std::set<char>& placed, char to_place,
+                        char to_place,
                         std::set<std::pair<int, int>> possible_positions,
                         int iter);
         void print();
