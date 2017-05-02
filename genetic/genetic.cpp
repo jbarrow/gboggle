@@ -31,13 +31,20 @@ int Genetic::tournament_selection(AliasTable* table, std::vector<double> scores)
   return scores[c_one] > scores[c_two] ? c_one : c_two;
 }
 
-void Genetic::pmx_2d_crossover(const Board *p1, const Board*p2, Board *update) {
+void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *update) {
+  int i, j;
+  int i1, j1, i2, j2;
+  char val;
+  std::vector<Point> unused;
+  // fill in the child with discernable char
+  for(i = 0; i < update->n; ++i)
+    for(j = 0; j < update->n; ++j)
+      update->board_state[i][j] = '0';
+
   // compute swath of p1
   std::random_device rd;
   std::mt19937 rng(rd());
-
   std::uniform_int_distribution<int> distribution(0, p1->n-1);
-  int i1, j1, i2, j2;
 
   i1 = distribution(rng);
   i2 = distribution(rng);
@@ -45,11 +52,12 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board*p2, Board *update) {
   j2 = distribution(rng);
 
   // copy swath to update
-  for(int i = std::min(i1, i2); i <= std::max(i1, i2); ++i)
-    for(int j = std::min(j1, j2); j <= std::max(j1, j2); ++j)
+  for(i = std::min(i1, i2); i <= std::max(i1, i2); ++i)
+    for(j = std::min(j1, j2); j <= std::max(j1, j2); ++j)
       update->board_state[i][j] = p1->board_state[i][j];
 
-  //
+  // compute list of unused values
+  // p2->get_index(char) returns a point
 }
 
 void Genetic::mutate(const Board *original, Board *update) {
