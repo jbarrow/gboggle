@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <map>
+#include <utility>
 
 #include "../board.h"
 
@@ -15,7 +17,12 @@ class AdjacencyMatrix {
 
         bool is_valid();
         Board* to_board();
-        bool fill_board(char** board, std::set<char>& to_add, int letter_idx, int x, int y, int iter);
+        bool fill_board(Board* board, std::map<char, std::set<char>>& constraints,
+                        std::set<char>& placed, char to_place,
+                        std::set<std::pair<int, int>> possible_positions,
+                        int iter);
+        void print();
+        std::map<char, std::set<char>> to_map(bool include_empty);
 
         bool **mat;
 };

@@ -27,6 +27,12 @@ Board::~Board() {
   delete[] this->board_state;
 }
 
+Board::Board(const Board& other) : Board(other.n) {
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++)
+      board_state[i][j] = other.board_state[i][j];
+}
+
 void Board::print() {
   int i, j;
   for(i = 0; i < n; ++i) {

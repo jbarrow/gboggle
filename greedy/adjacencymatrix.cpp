@@ -102,6 +102,29 @@ std::set<char> board_neighbors(char** board, int x, int y) {
     return ret;
 }
 
+std::set<std::pair<int, int>> blank_neighbors(char** board, int x, int y) {
+    std::set<std::pair<int, int>> ret;
+
+    for (int x_off = -1; x_off <= 1; x_off++) {
+        for (int y_off = -1; y_off <= 1; y_off++) {
+            if (x_off == 0 && y_off == 0) continue;
+
+            int x_pos = x + x_off;
+            int y_pos = y + y_off;
+
+            if (x_pos < 0) x_pos += 5;
+            if (x_pos > 4) x_pos -= 5;
+            if (y_pos < 0) y_pos += 5;
+            if (y_pos > 4) y_pos -= 5;
+
+            if (board[x_pos][y_pos] == 'X')
+                ret.insert(std::make_pair(x_pos, y_pos));
+        }
+    }
+
+    return ret;
+}
+
 std::set<char> adj_mat_neighbors(AdjacencyMatrix* adj, char c) {
     std::set<char> ret;
 
@@ -116,54 +139,142 @@ std::set<char> adj_mat_neighbors(AdjacencyMatrix* adj, char c) {
     return ret;
 }
 
-bool AdjacencyMatrix::fill_board(char** board, std::set<char>& to_add, int letter_idx, int x, int y,
+bool AdjacencyMatrix::fill_board(Board* board, std::map<char, std::set<char>>& constraints,
+                                 std::set<char>& placed, char to_place,
+                                 std::set<std::pair<int, int>> possible_positions,
                                  int iter) {
-    //if (board[x][y] != 'X') return false;
+    // if character has already been placed, return true (?)
+    if (placed.count(to_place) > 0) return true;
 
-    // add character at current position
-    char curr = index_to_char(letter_idx);
-    board[x][y] = curr;
-    to_add.erase(curr);
-    std::cout << "Curr: " << curr << std::endl;
 
-    // get each neighbor we want this character to have
-    std::set<char> neighbors = adj_mat_neighbors(this, curr);
-    for (char n : neighbors) {
-        std::set<char> neighbor_neighbors = adj_mat_neighbors(this, n);
+    // for each possible position passed in
+    for (std::pair<int, int> pos : possible_positions) {
+        bool violation = false;
 
-        std::set<char> intersection;
-        std::set_intersection(neighbors.begin(), neighbors.end(),
-                              neighbor_neighbors.begin(), neighbor_neighbors.end(),
-                              std::inserter(intersection, intersection.begin()));
+        int x = pos.first;
+        int y = pos.second;
 
-        std::cout << "Neighboring: " << n << ":   ";
-        for (char s : intersection)
-            std::cout << s << " ";
-        std::cout << std::endl;
+        // make a new board with the piece inserted here
+        Board* new_board = new Board(*board);
+        new_board->board_state[x][y] = to_place;
+        placed.insert(to_place);
+
+        // get current neighbors, and what neighbors are supposed to be
+        std::set<char> curr_neighbors = board_neighbors(new_board->board_state, x, y);
+        std::set<char> supposed_neighbors = constraints[to_place];
+
+        // loop through what neighbors are supposed to be. if the neighbor has already been
+        // placed, it should be in curr_neighbors (if not, we're in violation of a constraint,
+        // and continue to next position). if the neighbor hasn't already been placed, we add it
+        // to the list of things to place
+        std::set<char> neighbors_to_add;
+        for (char neigh : supposed_neighbors) {
+            if (placed.count(neigh) > 0) {
+                if (curr_neighbors.count(neigh) == 0) {
+                    violation = true;
+                    break;
+                }
+            } else {
+                neighbors_to_add.insert(neigh);
+            }
+        }
+        if (violation) {
+            placed.erase(to_place);
+            continue;
+        }
+
+        // for each neighbor we need to place
+        int neighbors_added = 0;
+        for (char neigh : neighbors_to_add) {
+            // get blank spaces around us
+            std::set<std::pair<int, int>> blank_spaces =
+                blank_neighbors(new_board->board_state, x, y);
+
+            // if there are more neighbors to add than blanks, that's a violation
+            if ((int)neighbors_to_add.size() - neighbors_added > (int)blank_spaces.size()) {
+                violation = true;
+                break;
+            }
+
+            bool add_success = fill_board(new_board, constraints,
+                                          placed, neigh, blank_spaces,
+                                          iter + 1);
+            if (!add_success) {
+                violation = true;
+                break;
+            }
+
+            neighbors_added++;
+        }
+        if (violation) {
+            placed.erase(to_place);
+            continue;
+        }
+
+        for (int i = 0; i < 5; i++)
+            for (int j = 0; j < 5; j++)
+                board->board_state[i][j] = new_board->board_state[i][j];
+
+        delete new_board;
+        return true;
     }
 
-
-    return true;
+    // if we weren't able to place the character at any of the possible positions,
+    // return false
+    return false;
 }
 
 // converts to board (ASSUMPTION: adjacency matrix is valid)
 Board* AdjacencyMatrix::to_board() {
+    std::map<char, std::set<char>> constraints = to_map(false);
+
+    std::set<char> alphabet;
+    for (char c : "abcdefghiklmnopqrstuvwxyz")
+        alphabet.insert(c);
+
+    std::set<char> placed;
+
     Board* b = new Board(5);
     for (int i = 0; i < 5; i++)
         for (int j = 0; j < 5; j++)
             b->board_state[i][j] = 'X';
 
-    std::set<char> to_add;
-    char alphabet[] = "abcdefghiklmnopqrstuvwxyz";
-    for (char c : alphabet)
-        to_add.insert(c);
+    std::set<std::pair<int, int>> initial_positions;
+    initial_positions.insert(std::make_pair(0, 0));
 
-    int x = std::rand() % 5;
-    int y = std::rand() % 5;
-    int letter_idx = std::rand() % 25;
-    
-    fill_board(b->board_state, to_add, letter_idx, x, y, 0);
-
+    bool success = fill_board(b, constraints, placed, 's', initial_positions, 0);
+    if (!success)
+        std::cout << "!!! FAILED !!!" << std::endl;
 
     return b;
 }
+
+void AdjacencyMatrix::print() {
+    std::map<char, std::set<char>> adj_map = to_map(false);
+
+    for (auto iter = adj_map.begin(); iter != adj_map.end(); iter++) {
+        char curr = iter->first;
+        std::set<char> neighbors = iter->second;
+
+        std::cout << curr << ": ";
+        for (char c : neighbors)
+            std::cout << c << " ";
+        std::cout << std::endl;
+    }
+}
+
+std::map<char, std::set<char>> AdjacencyMatrix::to_map(bool include_empty) {
+    std::map<char, std::set<char>> ret;
+
+    for (int i = 0; i < 25; i++) {
+        char curr = index_to_char(i);
+
+        std::set<char> neighbors = adj_mat_neighbors(this, curr);
+        if (include_empty || !neighbors.empty())
+            ret[curr] = neighbors;
+    }
+
+    return ret;
+}
+
+

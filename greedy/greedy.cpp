@@ -17,6 +17,7 @@ void Greedy::search() {
     // sanity check: print 10 longest words
     std::cout << "Top 10 longest words:" << std::endl;
     for (int i = 0; i < 10; i++) {
+        if (i >= (int)wordlist.size()) break;
         std::cout << "\t" << wordlist[i] << std::endl;
     }
 

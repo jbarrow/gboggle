@@ -14,6 +14,7 @@ public:
   Board(int n);
   Board(int n, char** board);
   ~Board();
+  Board(const Board& other);
 
   int score(Trie *dict);
   int word_score(std::string word);
