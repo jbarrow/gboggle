@@ -5,6 +5,8 @@ Genetic::Genetic(int population_size, Trie *dict) :
   int i;
   Board *b;
   char alphabet[] = "abcdefghiklmnopqrstuvwxyz";
+  std::set<char> alphabetSet(alphabet, alphabet+ALPHABET_SIZE);
+
 
   // initialize the population
   for(i = 0; i < population_size; ++i) {
@@ -31,15 +33,18 @@ int Genetic::tournament_selection(AliasTable* table, std::vector<double> scores)
   return scores[c_one] > scores[c_two] ? c_one : c_two;
 }
 
-void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *update) {
+void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
   int i, j;
-  int i1, j1, i2, j2;
+  int i1, j1, i2, j2, tmp;
+  Point point;
   char val;
-  std::vector<Point> unused;
+  std::set<char> unused(alphabetSet);
+  std::set<char> inChild;
+  std::vector<std::pair<Point, char>> fixList;
   // fill in the child with discernable char
-  for(i = 0; i < update->n; ++i)
-    for(j = 0; j < update->n; ++j)
-      update->board_state[i][j] = '0';
+  for(i = 0; i < child->n; ++i)
+    for(j = 0; j < child->n; ++j)
+      child->board_state[i][j] = '0';
 
   // compute swath of p1
   std::random_device rd;
@@ -51,13 +56,67 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *update) 
   j1 = distribution(rng);
   j2 = distribution(rng);
 
-  // copy swath to update
-  for(i = std::min(i1, i2); i <= std::max(i1, i2); ++i)
-    for(j = std::min(j1, j2); j <= std::max(j1, j2); ++j)
-      update->board_state[i][j] = p1->board_state[i][j];
+  if(j1 > j2){
+    temp = j1;
+    j1 = j2;
+    j2 = temp;
+  }
 
-  // compute list of unused values
-  // p2->get_index(char) returns a point
+  if(i1 > i2){
+    temp = i1;
+    i1 = i2;
+    i2 = temp;
+  }
+
+  // copy swath from Parent1 to update child
+  for(i = i1; i <= i2; ++i){
+    for(j = j1; j <= j2; ++j){
+      child->board_state[i][j] = p1->board_state[i][j];
+      inChild.insert(p1->board_state[i][j]);
+    }
+  }
+  // compute set of unused values
+  unused.erase(inChild.begin(), inChild.end);
+
+  // Figure out which values from Parent2's swath were not put in the child from Parent1
+  for(i = i1; i <= i2; ++i){
+    for(j = j1; j <= j2; ++j){
+      if(inChild.find(p2->board_state[i][j]) == inChild.end()){
+        point.x = i;
+        point.y = j;
+        val = p2->board_state[i][j];
+        fixList.push_back(std::pair <Point,char> fix (index,val));
+      }
+    }
+  }
+
+  // Fix all in fix list
+  for (std::vector<std::pair<Point, char>>::iterator it = fixList.begin(); it != fixList.end(); ++it){
+    point = it->first;
+    val = it->second;
+    // find position (in parent2) of value in Pair's position in child
+    point = p2->find_index(child->board_state[point.x][point.y]);
+    //If position is taken in child already, find position of item that is in its spot in parent 2
+    //Otherwise, put it there
+    while (child->board_state[point.x][point.y] != '0'){
+      point = p2->find_index(child->board_state[point.x][point.y]);
+    }
+
+    // If this is reached, we drop the Pair.value in Position
+    child->board_state[point.x][point.y] = val;
+    inChild.insert(val);
+  }
+
+  //Drop the remaining values in
+  for(i = 0; i < child->n; ++i){
+    for(j = 0; j < child->n; ++j){
+      if(inChild.find(p2->board_state[i][j]) == inChild.end()){
+        child->board_state[i][j] = p2->board_state[i][j];
+        // is this needed?
+        inChild.insert(p2->board_state[i][j]);
+      }
+    }
+  }
 }
 
 void Genetic::mutate(const Board *original, Board *update) {
