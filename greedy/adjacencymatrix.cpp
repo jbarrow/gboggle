@@ -80,12 +80,6 @@ bool AdjacencyMatrix::fill_board(Board* board, std::map<char, std::set<char>>& c
         std::set<char> curr_neighbors = new_board->chars_neighboring(x, y);
         std::set<char> supposed_neighbors = constraints[to_place];
 
-        // if we have more than 8 neighbors, return false
-        if (supposed_neighbors.size() > 8) {
-            delete new_board;
-            return false;
-        }
-
         // loop through what neighbors are supposed to be. if the neighbor has already been
         // placed, it should be in curr_neighbors (if not, we're in violation of a constraint,
         // and continue to next position). if the neighbor hasn't already been placed, we add it
@@ -112,9 +106,12 @@ bool AdjacencyMatrix::fill_board(Board* board, std::map<char, std::set<char>>& c
             std::set<std::pair<int, int>> blank_spaces =
                 new_board->blank_spaces_neighboring(x, y);
 
+            // try to add neighbor in any of these blank spaces
             bool add_success = fill_board(new_board, constraints,
                                           neigh, blank_spaces,
                                           iter + 1);
+
+            // if we can't, we have a violation
             if (!add_success) {
                 violation = true;
                 break;
@@ -146,8 +143,14 @@ Board* AdjacencyMatrix::to_board() {
         if (mat[i][i]) return NULL;
 
     std::map<char, std::set<char>> constraints = to_map(false);
-    std::set<char> chars_on_board;
+
+    // if any letter has more than 8 neighbors, return NULL
+    for (auto const& kv_pair : constraints)
+        if (kv_pair.second.size() > 8) return NULL;
+
     Board* b = new Board(5);
+    std::set<char> chars_on_board;
+
 
     // insert characters that have constraints on them first
     for (auto const& kv_pair : constraints) {
