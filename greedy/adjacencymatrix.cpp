@@ -28,8 +28,6 @@ AdjacencyMatrix::AdjacencyMatrix(AdjacencyMatrix* old, std::string to_add) : Adj
         char prev = to_add[i - 1];
         char curr = to_add[i];
 
-        if (prev == curr) continue;
-
         // get indices in matrix
         int prev_idx = char_to_index(prev);
         int curr_idx = char_to_index(curr);
@@ -81,12 +79,6 @@ bool AdjacencyMatrix::fill_board(Board* board, std::map<char, std::set<char>>& c
         // get current neighbors, and what neighbors are supposed to be
         std::set<char> curr_neighbors = new_board->chars_neighboring(x, y);
         std::set<char> supposed_neighbors = constraints[to_place];
-
-        // if neighbors contain self, return false (can't use the same letter twice)
-        if (supposed_neighbors.count(to_place) > 0) {
-            delete new_board;
-            return false;
-        }
 
         // if we have more than 8 neighbors, return false
         if (supposed_neighbors.size() > 8) {
@@ -147,6 +139,12 @@ bool AdjacencyMatrix::fill_board(Board* board, std::map<char, std::set<char>>& c
 
 // converts to board
 Board* AdjacencyMatrix::to_board() {
+    // if any of the diagonals of the adjacency matrix are set (i.e. a letter
+    // has to occur multiple times in a row), return NULL -- we can't make this
+    // board
+    for (int i = 0; i < 25; i++)
+        if (mat[i][i]) return NULL;
+
     std::map<char, std::set<char>> constraints = to_map(false);
     std::set<char> chars_on_board;
     Board* b = new Board(5);
