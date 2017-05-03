@@ -40,7 +40,7 @@ Board::Board(const Board& other) : Board(other.n) {
       board_state[i][j] = other.board_state[i][j];
 }
 
-void Board::print() {
+void Board::print() const {
   int i, j;
   for(i = 0; i < n; ++i) {
     for(j = 0; j < n; ++j) {
@@ -163,7 +163,7 @@ std::vector<std::string> Board::solve(Trie *dict) {
   return words;
 }
 
-Point Board::find_index(char value) {
+Point Board::find_index(char value) const {
   int i, j;
   Point point;
 

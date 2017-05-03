@@ -30,9 +30,9 @@ public:
   void sequence_init(char *alphabet, int alphabet_size);
   void permutation_init(char *alphabet, int alphabet_size);
   void random_init(char *alphabet, int alphabet_size);
-  void print();
+  void print() const;
 
-  Point find_index(char value);
+  Point find_index(char value) const;
 
   bool has_char(char c);
 
