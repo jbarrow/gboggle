@@ -76,9 +76,6 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
     i2 = temp;
   }
 
-  // std::cout << i1 << ", " << i2 << std::endl;
-  // std::cout << j1 << ", " << j2 << std::endl;
-
   // copy swath from Parent1 to update child
   for(i = i1; i <= i2; ++i){
     for(j = j1; j <= j2; ++j){
@@ -86,16 +83,6 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
       inChild.insert(p1->board_state[i][j]);
     }
   }
-
-  // for (const auto& p : unused) std::cout << p <<  " ";
-  // std::cout << std::endl;
-  // for (const auto& p : inChild) std::cout << p << " ";
-  // std::cout << std::endl;
-
-  // std::cout << "Parent" << std::endl;
-  // p1->print();
-  // std::cout << "Parent" << std::endl;
-  // p2->print();
 
   // compute set of unused values
   for (const auto& p : inChild) unused.erase(p);
@@ -141,8 +128,6 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
     }
   }
 
-  // std::cout << "Child" << std::endl;
-  // child->print();
 }
 
 void Genetic::mutate(const Board *original, Board *update) {
@@ -202,6 +187,8 @@ void Genetic::iterate() {
   std::vector<double> scores;
   std::vector<Board*> tmp;
 
+  // open mp parallelize this
+#pragma omp parallel for private(i)
   for(i = 0; i < population_size; ++i) {
     score = population[i]->score(dict);
     scores.push_back((double)score);
@@ -213,6 +200,8 @@ void Genetic::iterate() {
 
   AliasTable* table = new AliasTable(scores);
 
+  // openmp parallelize this
+#pragma omp parallel for private(i)
   for(i = 0; i < population_size; ++i) {
     build_child(buffer[i], table, scores);
   }

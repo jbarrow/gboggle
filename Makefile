@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-g -Wall -std=c++11
+CFLAGS=-g -Wall -std=c++11 -fopenmp
 
 all: trie.o board.o bruteforce.o genetic.o aliastable.o adjacencymatrix.o greedy.o
 	$(CC) $(CFLAGS) -o gnboggle trie.o board.o genetic.o aliastable.o genetic.cpp
