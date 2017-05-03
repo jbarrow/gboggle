@@ -3,7 +3,7 @@
 Genetic::Genetic(int population_size, Trie *dict) :
   population_size(population_size), dict(dict) {
   int i;
-  Board *b;
+  Board *b1, *b2;
   char alphabet[26] = "abcdefghiklmnopqrstuvwxyz";
   std::set<char> alphabetSet(alphabet, alphabet+ALPHABET_SIZE);
 
@@ -11,11 +11,12 @@ Genetic::Genetic(int population_size, Trie *dict) :
 
   // initialize the population
   for(i = 0; i < population_size; ++i) {
-    b = new Board(5);
-    b->permutation_init(alphabet, ALPHABET_SIZE);
+    b1 = new Board(5);
+    b1->permutation_init(alphabet, ALPHABET_SIZE);
+    b2 = new Board(5);
 
-    population.push_back(b);
-    buffer.push_back(b);
+    population.push_back(b1);
+    buffer.push_back(b2);
   }
 }
 
@@ -42,6 +43,7 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
   std::set<char> unused(alphabet_set);
   std::set<char> inChild;
   std::vector<std::pair<Point, char>> fixList;
+
   // fill in the child with discernable char
   for(i = 0; i < child->n; ++i)
     for(j = 0; j < child->n; ++j)
@@ -50,12 +52,17 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
   // compute swath of p1
   std::random_device rd;
   std::mt19937 rng(rd());
-  std::uniform_int_distribution<int> distribution(0, p1->n-2);
+  std::uniform_int_distribution<int> distribution(0, p1->n-1);
 
-  i1 = distribution(rng) + 1;
-  i2 = distribution(rng) + 1;
-  j1 = distribution(rng) + 1;
-  j2 = distribution(rng) + 1;
+  i1 = distribution(rng);
+  i2 = distribution(rng);
+  j1 = distribution(rng);
+  j2 = distribution(rng);
+
+  if(i1 == i2 || j1 == j2) {
+    select(p1, child);
+    return;
+  }
 
   if(j1 > j2){
     temp = j1;
@@ -69,6 +76,9 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
     i2 = temp;
   }
 
+  // std::cout << i1 << ", " << i2 << std::endl;
+  // std::cout << j1 << ", " << j2 << std::endl;
+
   // copy swath from Parent1 to update child
   for(i = i1; i <= i2; ++i){
     for(j = j1; j <= j2; ++j){
@@ -77,10 +87,15 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
     }
   }
 
-  for (const auto& p : unused) std::cout << p <<  " ";
-  std::cout << std::endl;
-  for (const auto& p : inChild) std::cout << p << " ";
-  std::cout << std::endl;
+  // for (const auto& p : unused) std::cout << p <<  " ";
+  // std::cout << std::endl;
+  // for (const auto& p : inChild) std::cout << p << " ";
+  // std::cout << std::endl;
+
+  // std::cout << "Parent" << std::endl;
+  // p1->print();
+  // std::cout << "Parent" << std::endl;
+  // p2->print();
 
   // compute set of unused values
   for (const auto& p : inChild) unused.erase(p);
@@ -126,10 +141,6 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
     }
   }
 
-  // std::cout << "Parent" << std::endl;
-  // p1->print();
-  // std::cout << "Parent" << std::endl;
-  // p2->print();
   // std::cout << "Child" << std::endl;
   // child->print();
 }
@@ -180,7 +191,8 @@ void Genetic::build_child(Board *child, AliasTable *table, std::vector<double> s
   } else {
     // 50% chance for crossover
     int p1 = tournament_selection(table, scores);
-    int p2 = tournament_selection(table, scores);
+    int p2 = p1;
+    while (p2 == p1) p2 = tournament_selection(table, scores);
     pmx_2d_crossover(population[p1], population[p2], child);
   }
 }
@@ -188,6 +200,7 @@ void Genetic::build_child(Board *child, AliasTable *table, std::vector<double> s
 void Genetic::iterate() {
   int i, score, index;
   std::vector<double> scores;
+  std::vector<Board*> tmp;
 
   for(i = 0; i < population_size; ++i) {
     score = population[i]->score(dict);
@@ -204,5 +217,7 @@ void Genetic::iterate() {
     build_child(buffer[i], table, scores);
   }
 
+  tmp = population;
   population = buffer;
+  buffer = tmp;
 }
