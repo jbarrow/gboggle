@@ -9,6 +9,8 @@
 #include <iostream>
 #include <random>
 #include <algorithm>
+#include <set>
+#include <utility>
 
 class Genetic {
   int population_size;
