@@ -10,9 +10,7 @@ AliasTable::AliasTable(std::vector<double> dist) {
 
 AliasTable::~AliasTable() {}
 
-int AliasTable::sample() {
-  std::random_device rd;
-  std::mt19937 rng(rd());
+int AliasTable::sample(std::mt19937 &rng) {
 
   std::uniform_int_distribution<int> ix_sampler(0, distribution.size()-1);
   std::uniform_real_distribution<double> vl_sampler(0, 1.0);

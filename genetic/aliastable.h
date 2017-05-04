@@ -18,7 +18,7 @@ public:
   AliasTable(std::vector<double> distribution);
   ~AliasTable();
 
-  int sample();
+  int sample(std::mt19937 &rng);
   void recompute(std::vector<double> distribution);
   void print();
 };

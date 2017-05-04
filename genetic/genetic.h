@@ -14,16 +14,17 @@
 
 class Genetic {
   int population_size;
+  double max;
   std::vector<Board*> population;
   std::vector<Board*> buffer;
   Trie *dict;
   std::set<char> alphabet_set;
 
-  int tournament_selection(AliasTable* table, std::vector<double> scores);
-  void pmx_2d_crossover(const Board *p1, const Board*p2, Board *update);
-  void mutate(const Board *original, Board *update);
+  int tournament_selection(AliasTable* table, std::vector<double> scores, std::mt19937 &rng);
+  void pmx_2d_crossover(const Board *p1, const Board*p2, Board *update, std::mt19937 &rng);
+  void mutate(const Board *original, Board *update, std::mt19937 &rng);
   void select(const Board *original, Board *update);
-  void build_child(Board *child, AliasTable *table, std::vector<double> scores);
+  void build_child(Board *child, AliasTable *table, std::vector<double> scores, std::mt19937 &rng);
 
 public:
   Genetic(int population_size, Trie *dict);

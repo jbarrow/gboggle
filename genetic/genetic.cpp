@@ -27,15 +27,15 @@ Genetic::~Genetic() {
   }
 }
 
-int Genetic::tournament_selection(AliasTable* table, std::vector<double> scores) {
+int Genetic::tournament_selection(AliasTable* table, std::vector<double> scores, std::mt19937 &rng) {
   // perform tournament selection on two candidate members of the population
-  int c_one = table->sample();
-  int c_two = table->sample();
+  int c_one = table->sample(rng);
+  int c_two = table->sample(rng);
 
   return scores[c_one] > scores[c_two] ? c_one : c_two;
 }
 
-void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
+void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child, std::mt19937 &rng) {
   int i, j;
   int i1, j1, i2, j2, temp;
   Point point;
@@ -50,8 +50,6 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
       child->board_state[i][j] = '0';
 
   // compute swath of p1
-  std::random_device rd;
-  std::mt19937 rng(rd());
   std::uniform_int_distribution<int> distribution(0, p1->n-1);
 
   i1 = distribution(rng);
@@ -130,12 +128,9 @@ void Genetic::pmx_2d_crossover(const Board *p1, const Board *p2, Board *child) {
 
 }
 
-void Genetic::mutate(const Board *original, Board *update) {
+void Genetic::mutate(const Board *original, Board *update, std::mt19937 &rng) {
   // copy over
   select(original, update);
-
-  std::random_device rd;
-  std::mt19937 rng(rd());
 
   std::uniform_int_distribution<int> distribution(0, original->n-1);
   int i1, j1, i2, j2;
@@ -158,27 +153,26 @@ void Genetic::select(const Board *original, Board *update) {
       update->board_state[i][j] = original->board_state[i][j];
 }
 
-void Genetic::build_child(Board *child, AliasTable *table, std::vector<double> scores) {
-  std::random_device rd;
-  std::mt19937 rng(rd());
-
+void Genetic::build_child(Board *child, AliasTable *table, std::vector<double> scores, std::mt19937 &rng) {
   std::uniform_real_distribution<double> distribution(0, 1);
   double action = distribution(rng);
 
-  if(action < 0.3) {
-    // 30% chance for selection and pass through
-    int p1 = tournament_selection(table, scores);
+  //std::cout << action << " ";
+
+  if(action < 0.2) {
+    // 20% chance for selection and pass through
+    int p1 = tournament_selection(table, scores, rng);
     select(population[p1], child);
-  } else if(action < 0.5) {
+  } else if(action < 0.4) {
     // 20% chance to mutate
-    int p1 = tournament_selection(table, scores);
-    mutate(population[p1], child);
+    int p1 = tournament_selection(table, scores, rng);
+    mutate(population[p1], child, rng);
   } else {
-    // 50% chance for crossover
-    int p1 = tournament_selection(table, scores);
+    // 60% chance for crossover
+    int p1 = tournament_selection(table, scores, rng);
     int p2 = p1;
-    while (p2 == p1) p2 = tournament_selection(table, scores);
-    pmx_2d_crossover(population[p1], population[p2], child);
+    while (p2 == p1) p2 = tournament_selection(table, scores, rng);
+    pmx_2d_crossover(population[p1], population[p2], child, rng);
   }
 }
 
@@ -188,23 +182,39 @@ void Genetic::iterate() {
   std::vector<Board*> tmp;
 
   // open mp parallelize this
-#pragma omp parallel for private(i)
+#pragma omp parallel for private(i, score)
   for(i = 0; i < population_size; ++i) {
     score = population[i]->score(dict);
     scores.push_back((double)score);
   }
 
-  double max = *max_element(scores.begin(), scores.end());
+  int gen_max = *std::max_element(scores.begin(), scores.end());
+  int max_index = std::max_element(scores.begin(), scores.end()) - scores.begin();
 
-  std::cout << "Best performer " << max << std::endl;
+  if (gen_max > max) {
+    max = gen_max;
+    Board best_board = *population[max_index];
+    std::cout << "Best performer " << max << std::endl;
+    best_board.print();
+    std::vector<std::string> words = best_board.solve(dict);
+    for (int k = 0; k < 20; ++k)
+      std::cout << words[k] << " ";
+    std::cout << std::endl;
+  } else {
+    std::cout << "- " << gen_max << std::endl;
+  }
 
   AliasTable* table = new AliasTable(scores);
 
   // openmp parallelize this
-#pragma omp parallel for private(i)
+#pragma omp parallel
+{
+  thread_local static std::mt19937 rng(std::random_device{}());
+#pragma omp for private(i)
   for(i = 0; i < population_size; ++i) {
-    build_child(buffer[i], table, scores);
+    build_child(buffer[i], table, scores, rng);
   }
+}
 
   tmp = population;
   population = buffer;
