@@ -5,3 +5,5 @@ grboggle
 data/test.txt
 *.dSYM/
 *.o
+.ipynb_checkpoints
+*.ipynb

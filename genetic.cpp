@@ -1,7 +1,6 @@
 #include "trie.h"
 #include "board.h"
 #include "genetic/genetic.h"
-#include "bruteforce/bruteforce.h"
 
 #include <iostream>
 #include <string>

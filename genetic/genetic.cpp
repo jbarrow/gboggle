@@ -182,7 +182,7 @@ void Genetic::iterate() {
   std::vector<Board*> tmp;
 
   // open mp parallelize this
-#pragma omp parallel for private(i, score)
+#pragma omp parallel for private(i, score) schedule(dynamic,50)
   for(i = 0; i < population_size; ++i) {
     score = population[i]->score(dict);
     scores[i] = (double)score;
