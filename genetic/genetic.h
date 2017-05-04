@@ -17,6 +17,7 @@ class Genetic {
   double max;
   std::vector<Board*> population;
   std::vector<Board*> buffer;
+  std::vector<double> scores;
   Trie *dict;
   std::set<char> alphabet_set;
 

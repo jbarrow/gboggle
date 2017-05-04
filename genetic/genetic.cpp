@@ -17,6 +17,7 @@ Genetic::Genetic(int population_size, Trie *dict) :
 
     population.push_back(b1);
     buffer.push_back(b2);
+    scores.push_back(0);
   }
 }
 
@@ -163,12 +164,12 @@ void Genetic::build_child(Board *child, AliasTable *table, std::vector<double> s
     // 20% chance for selection and pass through
     int p1 = tournament_selection(table, scores, rng);
     select(population[p1], child);
-  } else if(action < 0.4) {
-    // 20% chance to mutate
+  } else if(action < 0.5) {
+    // 30% chance to mutate
     int p1 = tournament_selection(table, scores, rng);
     mutate(population[p1], child, rng);
   } else {
-    // 60% chance for crossover
+    // 50% chance for crossover
     int p1 = tournament_selection(table, scores, rng);
     int p2 = p1;
     while (p2 == p1) p2 = tournament_selection(table, scores, rng);
@@ -178,14 +179,13 @@ void Genetic::build_child(Board *child, AliasTable *table, std::vector<double> s
 
 void Genetic::iterate() {
   int i, score, index;
-  std::vector<double> scores;
   std::vector<Board*> tmp;
 
   // open mp parallelize this
 #pragma omp parallel for private(i, score)
   for(i = 0; i < population_size; ++i) {
     score = population[i]->score(dict);
-    scores.push_back((double)score);
+    scores[i] = (double)score;
   }
 
   int gen_max = *std::max_element(scores.begin(), scores.end());
