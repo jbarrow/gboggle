@@ -54,8 +54,6 @@ void AliasTable::recompute(std::vector<double> dist) {
       overfull.pop_back();
       underfull.push_back(ox);
     }
-
-    //std::cout << "Fixed: " << ux << std::endl;
   }
 }
 

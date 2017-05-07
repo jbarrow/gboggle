@@ -216,6 +216,8 @@ void Genetic::iterate() {
   }
 }
 
+  delete table;
+
   tmp = population;
   population = buffer;
   buffer = tmp;
