@@ -7,17 +7,13 @@ inline char index_to_char(int i) { return 'a' + i + (int)(i >= (int)('j' - 'a'))
 
 // default constructor
 AdjacencyMatrix::AdjacencyMatrix() {
-    // initialize 25x25 adjacency matrix with all false
-    mat = new bool*[25];
-    for (int i = 0; i < 25; i++) {
-        mat[i] = new bool[25];
-
-        for (int j = 0; j < 25; j++) mat[i][j] = false;
-    }
+    initialize();
 }
 
 // "copy constructor" which adds new word to matrix
-AdjacencyMatrix::AdjacencyMatrix(AdjacencyMatrix* old, std::string to_add) : AdjacencyMatrix() {
+AdjacencyMatrix::AdjacencyMatrix(AdjacencyMatrix* old, std::string to_add) {
+    initialize();
+
     // copy old matrix
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 25; j++)
@@ -45,6 +41,16 @@ AdjacencyMatrix::AdjacencyMatrix(AdjacencyMatrix* old, std::string to_add) : Adj
 // destructor
 AdjacencyMatrix::~AdjacencyMatrix() {
     delete[] mat;
+}
+
+void AdjacencyMatrix::initialize() {
+    // initialize 25x25 adjacency matrix with all false
+    mat = new bool*[25];
+    for (int i = 0; i < 25; i++) {
+        mat[i] = new bool[25];
+
+        for (int j = 0; j < 25; j++) mat[i][j] = false;
+    }
 }
 
 // check for validity

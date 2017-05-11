@@ -14,6 +14,8 @@ class AdjacencyMatrix {
         AdjacencyMatrix();
         AdjacencyMatrix(AdjacencyMatrix* old, std::string to_add);
         ~AdjacencyMatrix();
+        
+        void initialize();
 
         bool is_valid();
         Board* to_board();
