@@ -10,26 +10,8 @@
 #include <cstdlib>
 
 Board::Board(int n) : n(n) {
-  initialize(n);
-}
+  // Create an nxn boggle board, and randomly initialize it.
 
-// Create an nxn boggle board with predefined values.
-Board::Board(int n, char **board) : n(n), board_state(board) {}
-
-Board::~Board() {
-  delete[] this->board_state[0];
-  delete[] this->board_state;
-}
-
-Board::Board(const Board& other) : n(other.n) {
-  initialize(other.n);
-
-  for (int i = 0; i < n; i++)
-    for (int j = 0; j < n; j++)
-      board_state[i][j] = other.board_state[i][j];
-}
-
-void Board::initialize(int n) {
   // allocate all the pointers we'll need
   board_state = new char*[n];
   board_state[0] = new char[n * n];
@@ -42,6 +24,20 @@ void Board::initialize(int n) {
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)
       board_state[i][j] = 'X';
+}
+
+// Create an nxn boggle board with predefined values.
+Board::Board(int n, char **board) : n(n), board_state(board) {}
+
+Board::~Board() {
+  delete[] this->board_state[0];
+  delete[] this->board_state;
+}
+
+Board::Board(const Board& other) : Board(other.n) {
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++)
+      board_state[i][j] = other.board_state[i][j];
 }
 
 void Board::print() const {

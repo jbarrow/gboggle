@@ -22,8 +22,6 @@ public:
   ~Board();
   Board(const Board& other);
 
-  void initialize(int n);
-
   int score(Trie *dict);
   int word_score(std::string word);
   std::vector<std::string> solve(Trie *dict);
