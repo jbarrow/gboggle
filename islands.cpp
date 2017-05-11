@@ -68,6 +68,7 @@ int main(int argc, char **argv) {
   //Create the swap population
   std::mt19937 rng(std::random_device{}());
   Genetic *g = new Genetic(population, trie);
+  std::vector<Board*> *tmp;
 
   for(int j = 0; j < swaps; ++j) {
     for(int i = 0; i < iterations; ++i) g->iterate();
@@ -80,6 +81,10 @@ int main(int argc, char **argv) {
     for(i = swap_population; i < population; ++i) {
       g->build_child((*(g->buffer))[i], table, g->scores, rng);
     }
+
+    tmp = g->population;
+    g->population = g->buffer;
+    g->buffer = tmp;
 
     delete table;
   }
