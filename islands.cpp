@@ -1,32 +1,59 @@
 #include "trie.h"
 #include "board.h"
 #include "genetic/genetic.h"
-#include "islands/island.h"
 
 #include <iostream>
 #include <string>
 #include <ctime>
 #include <cstdlib>
+#include <mpi.h>
 
-/*
- * TODO: implement swap within genetic.cpp -- need to take in the contents of a board
- *        and overwrite an old one (perhaps chosen from bottom of the population?)
- * TODO: implement MPI calls in swap that pass boards from one island to another
- * TODO: sample swap_population boards and feed them into swap
- */
 
-void swap() {
-  // handle all MPI calls in here
+void swap(Genetic *g, int swap_population, std::mt19937 &rng, AliasTable *table) {
+  int i, my_rank, world_size;
+  char** value;
+  std::vector<int> population_to_swap;
+  MPI_Status status;
+
+  // tournament select which ones to swap
+  for(i = 0; i < swap_population; ++i) {
+    population_to_swap.push_back(g->tournament_selection(table, g->scores, rng));
+  }
+
+  // MPI calls
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+  if(my_rank % 2 == 0) {
+    for(i = 0; i < swap_population; ++i) {
+      value = (*(g->population))[population_to_swap[i]]->board_state;
+      MPI_Send(&(value[0][0]), 25, MPI_CHAR, (my_rank+1)%world_size, my_rank, MPI_COMM_WORLD);
+    }
+  }
+
+  for(i = 0; i < swap_population; ++i) {
+    int recv_target = (my_rank + world_size - 1) % world_size;
+    value = (*(g->buffer))[i]->board_state;
+    MPI_Recv(&(value[0][0]), 25, MPI_CHAR, recv_target, recv_target, MPI_COMM_WORLD, &status);
+  }
+
+  if(my_rank % 2 == 1) {
+    for(i = 0; i < swap_population; ++i) {
+      value = (*(g->population))[population_to_swap[i]]->board_state;
+      MPI_Send(&(value[0][0]), 25, MPI_CHAR, (my_rank+1)%world_size, my_rank, MPI_COMM_WORLD);
+    }
+  }
 }
 
 int main(int argc, char **argv) {
   if(argc != 5) {
     std::cout << "Usage:" << std::endl;
-    std::cout << "\t./gboggle [iterations] [swaps] [population] [swap_population] [dictionary]" << std::endl;
+    std::cout << "\t./islands [iterations] [swaps] [population] [swap_population] [dictionary]" << std::endl;
     exit(0);
   }
 
   // get the iterations
+  int i;
   int iterations = atoi(argv[1]);
   int swaps = atoi(argv[2]);
   int population = atoi(argv[3]);
@@ -35,21 +62,25 @@ int main(int argc, char **argv) {
   Trie *trie = new Trie();
   read_dictionary(argv[5], trie);
 
+  //initialize MPI
+  MPI_Init(&argc, &argv);
+
+  //Create the swap population
+  std::mt19937 rng(std::random_device{}());
+
   for(int j = 0; j < swaps; ++j) {
     Genetic *g = new Genetic(population, trie);
     for(int i = 0; i < iterations; ++i) g->iterate();
 
-    // to get boards, use the Genetic class to randomly sample population members
-    for(int k = 0; k < swap_population; ++k) {
-      g->tournament_selection(/* NEED TO PASS RNG */);
-      // get the boards
+    // swap genetic material with island
+    AliasTable* table = new AliasTable(*(g->scores));
+    swap(g, swap_population, rng, table);
+
+    for(i = swap_population; i < population; ++i) {
+      g->build_child((*(g->buffer))[i], table, g->scores, rng);
     }
 
-    // sample island from number of mpi processes
-    // set up a random_uniform_int from 0 to number of processes and select one
-
-    // swap genetic material with island
-    swap();
+    delete table;
   }
 
   // clean up the trie

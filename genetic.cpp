@@ -33,6 +33,7 @@ int main(int argc, char **argv) {
 
   Genetic *g = new Genetic(atoi(argv[2]), trie);
   for(int i = 0; i < iterations; ++i) g->iterate();
+  delete g;
 
   // clean up the trie
   delete trie;

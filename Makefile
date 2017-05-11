@@ -1,10 +1,14 @@
-CC=g++-6
-CFLAGS=-g -Wall -std=c++11 -fopenmp -O3
+CC=mpicc
+CFLAGS=-g -Wall -std=c++11 #-O3 -fopenmp
 
 all: trie.o board.o bruteforce.o genetic.o aliastable.o adjacencymatrix.o greedy.o
 	$(CC) $(CFLAGS) -o gnboggle trie.o board.o genetic.o aliastable.o genetic.cpp
 	$(CC) $(CFLAGS) -o bfboggle trie.o board.o bruteforce.o bruteforce.cpp
 	$(CC) $(CFLAGS) -o grboggle trie.o board.o greedy.o adjacencymatrix.o greedy.cpp
+	mpicc $(CFLAGS) -v -o islands genetic.o trie.o board.o aliastable.o islands.cpp
+
+islands: genetic.o trie.o board.o aliastable.o
+	$(CC) $(CFLAGS) -o islands genetic.o trie.o board.o aliastable.o islands.cpp
 
 genetic: genetic.o trie.o board.o aliastable.o
 	$(CC) $(CFLAGS) -o gnboggle trie.o board.o genetic.o aliastable.o genetic.cpp
