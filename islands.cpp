@@ -35,6 +35,8 @@ void swap(Genetic *g, int swap_population, std::mt19937 &rng, AliasTable *table)
     int recv_target = (my_rank + world_size - 1) % world_size;
     value = (*(g->buffer))[i]->board_state;
     MPI_Recv(&(value[0][0]), 25, MPI_CHAR, recv_target, recv_target, MPI_COMM_WORLD, &status);
+    std::cout << "RECEIVED BOARD:::::" << std::endl;
+    (*(g->buffer))[i]->print();
   }
 
   if(my_rank % 2 == 1) {
