@@ -41,8 +41,8 @@ public:
 
   std::set<char> chars();
   std::set<char> chars_neighboring(int x, int y);
-  std::set<std::pair<int, int>> blank_spaces();
-  std::set<std::pair<int, int>> blank_spaces_neighboring(int x, int y);
+  std::set<std::pair<int, int> > blank_spaces();
+  std::set<std::pair<int, int> > blank_spaces_neighboring(int x, int y);
 };
 
 struct compare {

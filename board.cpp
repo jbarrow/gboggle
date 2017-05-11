@@ -235,8 +235,8 @@ std::set<char> Board::chars_neighboring(int x, int y) {
   return ret;
 }
 
-std::set<std::pair<int, int>> Board::blank_spaces() {
-  std::set<std::pair<int, int>> ret;
+std::set<std::pair<int, int> > Board::blank_spaces() {
+  std::set<std::pair<int, int> > ret;
   for (int x = 0; x < n; x++)
     for (int y = 0; y < n; y++)
       if (board_state[x][y] == 'X')
@@ -245,8 +245,8 @@ std::set<std::pair<int, int>> Board::blank_spaces() {
   return ret;
 }
 
-std::set<std::pair<int, int>> Board::blank_spaces_neighboring(int x, int y) {
-  std::set<std::pair<int, int>> ret;
+std::set<std::pair<int, int> > Board::blank_spaces_neighboring(int x, int y) {
+  std::set<std::pair<int, int> > ret;
 
   for (int x_off = -1; x_off <= 1; x_off++) {
     for (int y_off = -1; y_off <= 1; y_off++) {

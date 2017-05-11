@@ -46,7 +46,7 @@ void swap(Genetic *g, int swap_population, std::mt19937 &rng, AliasTable *table)
 }
 
 int main(int argc, char **argv) {
-  if(argc != 5) {
+  if(argc <= 5) {
     std::cout << "Usage:" << std::endl;
     std::cout << "\t./islands [iterations] [swaps] [population] [swap_population] [dictionary]" << std::endl;
     exit(0);
@@ -67,12 +67,13 @@ int main(int argc, char **argv) {
 
   //Create the swap population
   std::mt19937 rng(std::random_device{}());
+  Genetic *g = new Genetic(population, trie);
 
   for(int j = 0; j < swaps; ++j) {
-    Genetic *g = new Genetic(population, trie);
     for(int i = 0; i < iterations; ++i) g->iterate();
 
     // swap genetic material with island
+    std::cout << "***** SWAPPING" << std::endl << std::endl;
     AliasTable* table = new AliasTable(*(g->scores));
     swap(g, swap_population, rng, table);
 
@@ -83,6 +84,9 @@ int main(int argc, char **argv) {
     delete table;
   }
 
+  MPI_Finalize();
+
   // clean up the trie
+  delete g;
   delete trie;
 }
