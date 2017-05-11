@@ -151,7 +151,6 @@ Board* AdjacencyMatrix::to_board() {
     Board* b = new Board(5);
     std::set<char> chars_on_board;
 
-
     // insert characters that have constraints on them first
     for (auto const& kv_pair : constraints) {
         char c = kv_pair.first;
